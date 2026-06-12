@@ -1,0 +1,103 @@
+{
+  "min_cutoff": 1.1,
+  "beta": 0.03,
+  "calibration": {
+    "x0": -96,
+    "y0": -214,
+    "x1": 1255,
+    "y1": 711
+  },
+  "macros": {
+    "rock": [
+      "ctrl",
+      "up"
+    ],
+    "pinky": [
+      "command",
+      "shift",
+      "3"
+    ]
+  },
+  "gesture_threshold": 0.85,
+  "gesture_actions": {
+    "g1": [
+      "command",
+      "c"
+    ],
+    "g2": [
+      "command",
+      "v"
+    ]
+  },
+  "swipe": {
+    "next": [
+      "ctrl",
+      "right"
+    ],
+    "prev": [
+      "ctrl",
+      "left"
+    ]
+  },
+  "menu": [
+    {
+      "label": "Copy",
+      "keys": [
+        "command",
+        "c"
+      ]
+    },
+    {
+      "label": "Paste",
+      "keys": [
+        "command",
+        "v"
+      ]
+    },
+    {
+      "label": "Shot",
+      "keys": [
+        "command",
+        "shift",
+        "3"
+      ]
+    },
+    {
+      "label": "Mission",
+      "keys": [
+        "ctrl",
+        "up"
+      ]
+    },
+    {
+      "label": "Spotlight",
+      "keys": [
+        "command",
+        "space"
+      ]
+    },
+    {
+      "label": "Undo",
+      "keys": [
+        "command",
+        "z"
+      ]
+    }
+  ],
+  "app_profiles": {
+    "Google Chrome": {
+      "swipe": {
+        "next": [
+          "command",
+          "shift",
+          "]"
+        ],
+        "prev": [
+          "command",
+          "shift",
+          "["
+        ]
+      }
+    }
+  }
+}
