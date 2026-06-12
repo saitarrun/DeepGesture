@@ -1,0 +1,53 @@
+name: Feature Request
+description: Propose a new gesture, capability, or architectural improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Check existing issues first — your idea may already be tracked.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What use case does this enable? What limitation does it remove?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Be concrete. If ML change, sketch the architecture. If new gesture, describe the hand shape and target action.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you consider and why did you rule it out?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Gesture recognition (ML)
+        - New gesture vocabulary
+        - Performance / latency
+        - macOS integration / Accessibility API
+        - Developer tooling (CLI, training, dataset)
+        - Platform compatibility
+        - Documentation
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Willing to implement?
+      options:
+        - label: "Yes, I can open a PR for this"
+        - label: "I can help with testing / data collection"

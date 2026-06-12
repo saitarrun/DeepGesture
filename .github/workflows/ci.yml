@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        run: pip install ruff==0.4.4
+
+      - name: Lint
+        run: ruff check . --output-format=github --select=E,W,F,I --ignore=E501
+
+  test:
+    name: Tests / Python ${{ matrix.python-version }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        run: |
+          pytest test_virtual_mouse.py \
+            -v \
+            --tb=short \
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-omit="test_*"
+
+      - name: Upload coverage
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  benchmark:
+    name: Inference benchmark (smoke)
+    runs-on: macos-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Inference latency check
+        run: |
+          python - <<'EOF'
+          import time, numpy as np
+          from gesture_ml import GestureClassifier, landmark_features
+
+          rng = np.random.default_rng(42)
+          lm = [(float(rng.uniform(400, 800)), float(rng.uniform(300, 600))) for _ in range(21)]
+
+          clf = GestureClassifier(threshold=0.85)
+          for i in range(10):
+              clf.add("g1", landmark_features(lm))
+
+          N = 1000
+          start = time.perf_counter()
+          for _ in range(N):
+              clf.predict(landmark_features(lm))
+          ms = (time.perf_counter() - start) / N * 1000
+
+          print(f"Inference latency: {ms:.3f} ms/frame (budget: <5ms)")
+          assert ms < 5.0, f"Regression: {ms:.2f}ms exceeds 5ms budget"
+          EOF
